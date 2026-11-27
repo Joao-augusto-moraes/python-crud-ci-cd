@@ -1,41 +1,68 @@
-# Projeto Simples - CRUD em Python
+# CRUD Python com Docker e CI/CD
 
-Este é um projeto básico para demonstrar um CRUD (Create, Read, Update e Delete) rápido feito inteiramente em Python, operando em memória (uma lista, sem a necessidade de um sistema de banco de dados externo) e que inclui também suporte à containerização (Docker) e Automação (CI/CD via GitHub Actions).
+Um CRUD simples de usuários em Python, usado como base para praticar **testes automatizados, containerização e pipeline de CI/CD** com GitHub Actions.
 
-## 🗂 Estrutura do Projeto
+O foco aqui não é a aplicação, e sim o caminho que ela percorre: cada push dispara o pipeline, que instala as dependências, roda os testes e avisa o resultado no Discord.
 
-* `crud.py`: Script principal que contém a lógica do CRUD em listas.
-* `Dockerfile`: Configurações de passo a passo para empacotar e rodar a nossa aplicação dentro de um Container Docker.
-* `requeriments.txt`: Arquivo com a listagem de dependências que a aplicação necessita para funcionar.
-* `.github/workflows/ci-cd.yml`: Arquivo de Pipeline do GitHub Actions, acoplado para testar automaticamente e simular um Deploy a cada alteração aprovada para a branch `main`.
+## 🧱 Stack
 
-## 🚀 Como Executar Localmente
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white&style=flat-square)
+![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?logo=pytest&logoColor=white&style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white&style=flat-square)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=githubactions&logoColor=white&style=flat-square)
 
-### Pelo Terminal do seu Computador (Tradicional)
-1. Certifique-se de que o **Python (3.x)** se encontra instalado em sua máquina.
-2. Pelo seu terminal, vá para a pasta raiz e rode o comando:
-   ```bash
-   python crud.py
-   ```
-   > Ou digite `python3 crud.py` (dependendo do seu Sistema Operacional)
+## ⚙️ Como o pipeline funciona
 
-### Através do Docker (Isolado)
-1. Com o software Docker aberto rodando em sua máquina, crie a imagem rodando (não esqueça o ponto no final):
-   ```bash
-   docker build -t meu-crud-python .
-   ```
-2. Após carregar os dados e construir a imagem, crie e rode o container instantaneamente fazendo o seguinte:
-   ```bash
-   docker run --rm meu-crud-python
-   ```
+```
+push em qualquer branch / PR para main
+        │
+        ▼
+ 1. Checkout do código
+ 2. Configura Python
+ 3. Instala dependências (pytest)
+ 4. Roda os testes do CRUD        ← CI
+ 5. Deploy simulado               ← CD
+ 6. Notifica o status no Discord  (sempre, passando ou falhando)
+```
 
-## ⚙️ Ação CI/CD (Pipeline)
+O arquivo do pipeline fica em [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml).
 
-Este repositório faz parte dos testes que usa o **GitHub Actions**. Com isto integrado, assim que existir um envio de código (`push` ou `pull_request`) na branch `main`:
-1. Será configurado um ambiente livre de vícios com Ubuntu e Python 3.9.
-2. Ação fará o pip install em cima do `requeriments.txt`.
-3. Executa a prova para ver se houve alguma avaria no nosso `crud.py` criado.
-4. Passando na prova, libera aviso para dar vazão à simulação de Deploy.
+## 📂 Estrutura
 
----
-*Criado e desenvolvido como experimento didático e rápido!*
+| Arquivo | Para que serve |
+|---|---|
+| `crud.py` | Funções de criar, listar, buscar, atualizar e deletar usuários (em memória) |
+| `test_crud.py` | 5 testes com pytest, um para cada operação |
+| `Dockerfile` | Empacota a aplicação numa imagem `python:3.11-slim` |
+| `requeriments.txt` | Dependências do projeto |
+| `.github/workflows/ci-cd.yml` | Pipeline de CI/CD |
+
+## ▶️ Como rodar
+
+**Localmente**
+```bash
+pip install -r requeriments.txt
+python crud.py          # executa a demonstração
+pytest test_crud.py     # roda os testes
+```
+
+**Com Docker**
+```bash
+docker build -t crud-python .
+docker run --rm crud-python
+```
+
+## 🧠 O que pratiquei
+
+- Escrever testes isolados com `pytest` e fixtures (a lista é limpa antes de cada teste)
+- Montar um pipeline com gatilhos por push e por pull request
+- Usar *secrets* do GitHub para guardar o webhook do Discord
+- Containerizar uma aplicação Python
+
+## 🔭 Próximos passos
+
+- [ ] Renomear `requeriments.txt` para `requirements.txt` e remover o `|| true` da instalação, para o pipeline falhar de verdade quando algo der errado
+- [ ] Alinhar a versão do Python entre CI (3.9) e Docker (3.11)
+- [ ] Fazer o pipeline construir a imagem Docker em vez de só simular o deploy
+- [ ] Retornar erro ao deletar ou atualizar um ID inexistente
+- [ ] Adicionar `.gitignore` e `.dockerignore` (tirar a pasta `__pycache__`)

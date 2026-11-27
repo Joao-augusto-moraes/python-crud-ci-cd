@@ -1,5 +1,7 @@
 # CRUD Python com Docker e CI/CD
 
+> 🎓 **Projeto acadêmico** · Análise e Desenvolvimento de Sistemas, PUCPR · 2026
+
 Um CRUD simples de usuários em Python, usado como base para praticar **testes automatizados, containerização e pipeline de CI/CD** com GitHub Actions.
 
 O foco aqui não é a aplicação, e sim o caminho que ela percorre: cada push dispara o pipeline, que instala as dependências, roda os testes e avisa o resultado no Discord.

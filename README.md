@@ -17,12 +17,19 @@ O foco aqui não é a aplicação, e sim o caminho que ela percorre: cada push d
 push em qualquer branch / PR para main
         │
         ▼
- 1. Checkout do código
- 2. Configura Python
- 3. Instala dependências (pytest)
- 4. Roda os testes do CRUD        ← CI
- 5. Deploy simulado               ← CD
- 6. Notifica o status no Discord  (sempre, passando ou falhando)
+ Job 1 · Testes (CI)
+   1. Checkout do código
+   2. Configura Python 3.11 (a mesma versão da imagem Docker)
+   3. Instala dependências (falha de verdade se algo der errado)
+   4. Roda os testes do CRUD
+        │ só segue se os testes passarem
+        ▼
+ Job 2 · Docker (CD)
+   5. Constrói a imagem Docker
+   6. Executa o container como teste rápido (smoke test)
+        │
+        ▼
+ Job 3 · Notifica o status no Discord (sempre, passando ou falhando)
 ```
 
 O arquivo do pipeline fica em [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml).
@@ -34,14 +41,14 @@ O arquivo do pipeline fica em [`.github/workflows/ci-cd.yml`](.github/workflows/
 | `crud.py` | Funções de criar, listar, buscar, atualizar e deletar usuários (em memória) |
 | `test_crud.py` | 5 testes com pytest, um para cada operação |
 | `Dockerfile` | Empacota a aplicação numa imagem `python:3.11-slim` |
-| `requeriments.txt` | Dependências do projeto |
+| `requirements.txt` | Dependências do projeto |
 | `.github/workflows/ci-cd.yml` | Pipeline de CI/CD |
 
 ## ▶️ Como rodar
 
 **Localmente**
 ```bash
-pip install -r requeriments.txt
+pip install -r requirements.txt
 python crud.py          # executa a demonstração
 pytest test_crud.py     # roda os testes
 ```
@@ -61,8 +68,8 @@ docker run --rm crud-python
 
 ## 🔭 Próximos passos
 
-- [ ] Renomear `requeriments.txt` para `requirements.txt` e remover o `|| true` da instalação, para o pipeline falhar de verdade quando algo der errado
-- [ ] Alinhar a versão do Python entre CI (3.9) e Docker (3.11)
-- [ ] Fazer o pipeline construir a imagem Docker em vez de só simular o deploy
+- [x] Renomear o arquivo de dependências para `requirements.txt` e remover o `|| true` da instalação
+- [x] Alinhar a versão do Python entre CI e Docker (3.11)
+- [x] Fazer o pipeline construir e executar a imagem Docker
 - [ ] Retornar erro ao deletar ou atualizar um ID inexistente
-- [ ] Adicionar `.gitignore` e `.dockerignore` (tirar a pasta `__pycache__`)
+- [x] Adicionar `.gitignore` e `.dockerignore` (tirar a pasta `__pycache__`)
